@@ -11,7 +11,7 @@ Two plugins, no Hermes core changes:
 | Plugin | Path | What it does |
 |---|---|---|
 | [model-provider profile](plugins/model-providers/meridian/README.md) | `plugins/model-providers/meridian/` | Registers `provider: meridian` — credentials, live model catalog, `hermes doctor` probe, aux-model default, best-effort `api_mode` auto-detection |
-| [tools plugin](plugins/meridian/README.md) | `plugins/meridian/` | Agent tools + `/meridian` slash command: health, quota, model list, account profiles, OAuth refresh, self-install helper |
+| [tools plugin](plugins/meridian-tools/README.md) | `plugins/meridian-tools/` | Agent tools + `/meridian` slash command: health, quota, model list, account profiles, OAuth refresh, self-install helper |
 
 ## Disclaimer
 
@@ -32,7 +32,7 @@ The two plugins need different install paths — Hermes' generic
 **Tools plugin** — works normally:
 
 ```bash
-hermes plugins install jdotcole/hermes-provider-meridian/plugins/meridian
+hermes plugins install jdotcole/hermes-provider-meridian/plugins/meridian-tools
 hermes plugins enable meridian
 ```
 
@@ -83,7 +83,7 @@ placeholder if it runs without auth.
 See the [provider profile README](plugins/model-providers/meridian/README.md)
 for `api_mode` auto-detection details, model naming, and migrating from a
 `custom_providers` entry. See the
-[tools plugin README](plugins/meridian/README.md) for the full tool/slash
+[tools plugin README](plugins/meridian-tools/README.md) for the full tool/slash
 command reference.
 
 ## Repo layout
@@ -91,7 +91,7 @@ command reference.
 ```
 plugins/
 ├── model-providers/meridian/   # ProviderProfile plugin (auto-discovered)
-└── meridian/                   # general plugin: tools + /meridian command
+└── meridian-tools/             # general plugin: tools + /meridian command
 install.sh                      # shell-based bootstrap for both plugins
 ```
 

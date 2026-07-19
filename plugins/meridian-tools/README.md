@@ -11,7 +11,7 @@ Works through Hermes' normal plugin flow — dashboard "install from URL"
 pointed at this subfolder, or:
 
 ```bash
-hermes plugins install jdotcole/hermes-provider-meridian/plugins/meridian
+hermes plugins install jdotcole/hermes-provider-meridian/plugins/meridian-tools
 hermes plugins enable meridian
 ```
 

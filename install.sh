@@ -43,7 +43,7 @@ install_one() {
 
 echo "Installing meridian plugins into $HERMES_HOME"
 install_one "$SRC_DIR/plugins/model-providers/meridian" "$HERMES_HOME/plugins/model-providers/meridian"
-install_one "$SRC_DIR/plugins/meridian" "$HERMES_HOME/plugins/meridian"
+install_one "$SRC_DIR/plugins/meridian-tools" "$HERMES_HOME/plugins/meridian"
 
 cat <<EOF
 
