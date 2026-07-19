@@ -1,0 +1,11 @@
+name: meridian
+version: 1.0.0
+description: "Meridian Claude-proxy management: health, Claude Max quota, model catalog, account profiles, OAuth refresh — as agent tools and a /meridian slash command."
+author: Jake Cole
+provides_tools:
+  - meridian_status
+  - meridian_quota
+  - meridian_models
+  - meridian_profiles
+  - meridian_switch_profile
+  - meridian_refresh_auth
