@@ -57,6 +57,6 @@ Done. Next steps:
        model:
          provider: meridian
          default: claude-sonnet-4-6
-         api_mode: anthropic_messages
+     (api_mode is usually auto-detected — see plugins/model-providers/meridian/README.md)
   4. Verify:  hermes doctor   (Meridian appears under Provider Connectivity)
 EOF

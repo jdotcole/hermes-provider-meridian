@@ -13,7 +13,15 @@ Tools (toolset ``meridian``):
   - meridian_refresh_auth    force an OAuth token refresh
 
 Slash command:
-  /meridian [status|quota|models|profiles|refresh|switch <id>]
+  /meridian [status|quota|models|profiles|refresh|switch <id>|install-provider]
+
+CLI:
+  hermes meridian install-provider [--force]
+
+`install-provider` is deliberately human/CLI-only, not an agent-callable
+tool — see install_provider.py for why it exists (Hermes' plugin installer
+can't place a model-provider profile at its required fixed path) and why
+letting the agent trigger it autonomously would be the wrong default.
 """
 
 from __future__ import annotations
@@ -21,6 +29,8 @@ from __future__ import annotations
 import json
 import logging
 
+from . import cli as _cli
+from . import install_provider as _install_provider
 from . import schemas, tools
 
 logger = logging.getLogger(__name__)
@@ -54,8 +64,11 @@ def _handle_slash(raw_args: str) -> str:
         if len(parts) < 2:
             return "Usage: /meridian switch <profile-id>"
         return _fmt(tools.meridian_switch_profile({"profile": parts[1]}))
+    if sub == "install-provider":
+        return _install_provider.install_provider(force="force" in parts[1:])
     return (
-        "Usage: /meridian [status|quota [all]|models|profiles|refresh [profile]|switch <id>]"
+        "Usage: /meridian [status|quota [all]|models|profiles|refresh [profile]|"
+        "switch <id>|install-provider [force]]"
     )
 
 
@@ -99,5 +112,16 @@ def register(ctx) -> None:
     ctx.register_command(
         "meridian",
         handler=_handle_slash,
-        description="Meridian Claude proxy: status, quota, profiles, auth refresh.",
+        description="Meridian Claude proxy: status, quota, profiles, auth refresh, install-provider.",
+    )
+    ctx.register_cli_command(
+        name="meridian",
+        help="Meridian plugin utilities",
+        setup_fn=_cli.register_cli,
+        handler_fn=_cli.meridian_command,
+        description=(
+            "Install the meridian model-provider profile "
+            "($HERMES_HOME/plugins/model-providers/meridian/) without shell "
+            "or SSH access to the Hermes host."
+        ),
     )
