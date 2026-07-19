@@ -112,7 +112,7 @@ def meridian_status(args: dict, **kwargs) -> str:
             )
 
     # Surface whether the sibling model-provider plugin's api_mode
-    # auto-detection patch is active — see plugins/model-providers/meridian/
+    # auto-detection patch is active — see plugins/meridian-provider/
     # for what this does and why it can be off (opted out, still deferred,
     # or gave up after Hermes internals changed underneath it). Looked up via
     # the provider registry rather than a direct module import: as a user

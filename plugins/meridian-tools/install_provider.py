@@ -24,7 +24,7 @@ import tempfile
 from pathlib import Path
 
 DEFAULT_REPO_URL = "https://github.com/jdotcole/hermes-provider-meridian.git"
-PROVIDER_SUBDIR = "plugins/model-providers/meridian"
+PROVIDER_SUBDIR = "plugins/meridian-provider"
 _CLONE_TIMEOUT_SECONDS = 60
 
 

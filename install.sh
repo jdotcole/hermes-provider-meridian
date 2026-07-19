@@ -42,7 +42,7 @@ install_one() {
 }
 
 echo "Installing meridian plugins into $HERMES_HOME"
-install_one "$SRC_DIR/plugins/model-providers/meridian" "$HERMES_HOME/plugins/model-providers/meridian"
+install_one "$SRC_DIR/plugins/meridian-provider" "$HERMES_HOME/plugins/model-providers/meridian"
 install_one "$SRC_DIR/plugins/meridian-tools" "$HERMES_HOME/plugins/meridian"
 
 cat <<EOF
@@ -57,6 +57,6 @@ Done. Next steps:
        model:
          provider: meridian
          default: claude-sonnet-4-6
-     (api_mode is usually auto-detected — see plugins/model-providers/meridian/README.md)
+     (api_mode is usually auto-detected — see plugins/meridian-provider/README.md)
   4. Verify:  hermes doctor   (Meridian appears under Provider Connectivity)
 EOF

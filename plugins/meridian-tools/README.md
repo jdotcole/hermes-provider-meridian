@@ -45,7 +45,7 @@ on 401s instead of paging a human), and multi-account rotation via
 
 ## `install-provider`
 
-The companion `plugins/model-providers/meridian/` profile can't be installed
+The companion `plugins/meridian-provider/` profile can't be installed
 through Hermes' normal plugin flow at all — that flow always drops a plugin
 flat under `$HERMES_HOME/plugins/<name>/`, but a model-provider profile is
 only ever discovered from the fixed path

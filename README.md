@@ -10,7 +10,7 @@ Two plugins, no Hermes core changes:
 
 | Plugin | Path | What it does |
 |---|---|---|
-| [model-provider profile](plugins/model-providers/meridian/README.md) | `plugins/model-providers/meridian/` | Registers `provider: meridian` — credentials, live model catalog, `hermes doctor` probe, aux-model default, best-effort `api_mode` auto-detection |
+| [model-provider profile](plugins/meridian-provider/README.md) | `plugins/meridian-provider/` | Registers `provider: meridian` — credentials, live model catalog, `hermes doctor` probe, aux-model default, best-effort `api_mode` auto-detection |
 | [tools plugin](plugins/meridian-tools/README.md) | `plugins/meridian-tools/` | Agent tools + `/meridian` slash command: health, quota, model list, account profiles, OAuth refresh, self-install helper |
 
 ## Disclaimer
@@ -80,7 +80,7 @@ Hermes refuses to run an api-key provider with an empty secret, so
 `MERIDIAN_API_KEY` must always be set — to the proxy's real key, or any
 placeholder if it runs without auth.
 
-See the [provider profile README](plugins/model-providers/meridian/README.md)
+See the [provider profile README](plugins/meridian-provider/README.md)
 for `api_mode` auto-detection details, model naming, and migrating from a
 `custom_providers` entry. See the
 [tools plugin README](plugins/meridian-tools/README.md) for the full tool/slash
@@ -90,8 +90,8 @@ command reference.
 
 ```
 plugins/
-├── model-providers/meridian/   # ProviderProfile plugin (auto-discovered)
-└── meridian-tools/             # general plugin: tools + /meridian command
+├── meridian-provider/   # ProviderProfile plugin (auto-discovered)
+└── meridian-tools/      # general plugin: tools + /meridian command
 install.sh                      # shell-based bootstrap for both plugins
 ```
 
