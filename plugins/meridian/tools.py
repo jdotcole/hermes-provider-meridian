@@ -110,6 +110,23 @@ def meridian_status(args: dict, **kwargs) -> str:
                 "The proxy has no valid Claude login. Try meridian_refresh_auth; "
                 "if that fails, run 'claude login' on the proxy host."
             )
+
+    # Surface whether the sibling model-provider plugin's api_mode
+    # auto-detection patch is active — see plugins/model-providers/meridian/
+    # for what this does and why it can be off (opted out, still deferred,
+    # or gave up after Hermes internals changed underneath it). Looked up via
+    # the provider registry rather than a direct module import: as a user
+    # plugin, that module loads under a generated name
+    # (_hermes_user_provider_meridian), not a fixed one.
+    try:
+        from providers import get_provider_profile
+
+        profile = get_provider_profile("meridian")
+        if profile is not None and hasattr(profile, "patch_status"):
+            result["api_mode_patch"] = profile.patch_status()
+    except Exception:
+        pass
+
     return json.dumps(result)
 
 
