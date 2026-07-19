@@ -1,7 +1,7 @@
 # meridian — model provider profile
 
 Registers `meridian` as a first-class Hermes inference provider. See the
-[repo README](../../README.md) for the big picture and disclaimers.
+[repo README](../README.md) for the big picture and disclaimers.
 
 ## Install
 
@@ -12,7 +12,7 @@ and that flow always drops a plugin flat under `$HERMES_HOME/plugins/<name>/`
 instead. Use one of:
 
 ```bash
-# from inside a running Hermes with the plugins/meridian-tools/ tools plugin
+# from inside a running Hermes with the tools plugin (this repo's root)
 # installed and enabled — no shell/SSH needed:
 /meridian install-provider
 # or: hermes meridian install-provider

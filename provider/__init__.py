@@ -121,7 +121,7 @@ _patch_state = {"applied": False, "gave_up": False, "attempts": 0, "last_error":
 def patch_status() -> dict:
     """Current state of the api_mode auto-detection patch. Read-only
     snapshot for diagnostics (see the meridian_status tool in the
-    companion plugins/meridian/ tools plugin)."""
+    companion tools plugin, at this repo's root)."""
     return dict(_patch_state)
 
 
