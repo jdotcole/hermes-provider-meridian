@@ -130,7 +130,21 @@ def meridian_status(args: dict, **kwargs) -> str:
     return json.dumps(result)
 
 
+_RESET_TIME_KEYS = ("resetsAt", "overageResetsAt", "observedAt", "fetchedAt")
+
+
 def _format_quota_windows(windows: list) -> list:
+    """Normalize a list of quota bucket/window entries from Meridian.
+
+    ``utilization: null`` is a real, documented state in Meridian's own
+    response shape (server.ts's /v1/usage/quota handler) — it means this
+    bucket has no OAuth-derived percentage available, either because the
+    account isn't logged in via Claude Max OAuth for that profile, or this
+    bucket type simply isn't one OAuth exposes. The bucket can still be
+    meaningful via its overage fields (isUsingOverage/overageStatus). This
+    annotates *why* utilization is missing instead of silently passing
+    through a bare null, which reads as broken rather than expected.
+    """
     out = []
     for w in windows or []:
         if not isinstance(w, dict):
@@ -139,8 +153,21 @@ def _format_quota_windows(windows: list) -> list:
         util = entry.get("utilization")
         if isinstance(util, (int, float)) and util <= 1.0:
             entry["utilization_pct"] = round(util * 100, 1)
-        if entry.get("resetsAt"):
-            entry["resetsAt"] = _iso(entry["resetsAt"])
+        elif util is None:
+            if entry.get("isUsingOverage"):
+                entry["utilization_note"] = (
+                    "no OAuth-derived percentage for this window; tracked via "
+                    "overage instead — see overageStatus/overageResetsAt."
+                )
+            else:
+                entry["utilization_note"] = (
+                    "no percentage available for this window (no Claude Max "
+                    "OAuth usage data reported for it yet, or this profile "
+                    "isn't OAuth-based)."
+                )
+        for key in _RESET_TIME_KEYS:
+            if entry.get(key):
+                entry[key] = _iso(entry[key])
         out.append(entry)
     return out
 
@@ -157,8 +184,17 @@ def meridian_quota(args: dict, **kwargs) -> str:
 
     if all_profiles:
         for p in data.get("profiles", []):
-            if isinstance(p, dict):
-                p["windows"] = _format_quota_windows(p.get("windows", []))
+            if not isinstance(p, dict):
+                continue
+            p["windows"] = _format_quota_windows(p.get("windows", []))
+            # error is None | "no_token" | "not_oauth" — the direct signal
+            # for why a profile's windows/utilization came back empty.
+            if p.get("error") == "no_token":
+                p["error_note"] = "not logged in — run meridian_refresh_auth or 'claude login' on the proxy host."
+            elif p.get("error") == "not_oauth":
+                p["error_note"] = "this profile uses an API key, not Claude Max OAuth — no usage percentage is exposed for it."
+            if p.get("fetchedAt"):
+                p["fetchedAt"] = _iso(p["fetchedAt"])
         if data.get("asOf"):
             data["asOf"] = _iso(data["asOf"])
         return json.dumps(data)
@@ -167,13 +203,42 @@ def meridian_quota(args: dict, **kwargs) -> str:
     for key in ("buckets", "windows"):
         if isinstance(data.get(key), list):
             data[key] = _format_quota_windows(data[key])
+    if data.get("asOf"):
+        data["asOf"] = _iso(data["asOf"])
     if not any(data.get(k) for k in ("buckets", "windows")):
         data.setdefault(
             "note",
             "No quota data observed yet — the proxy reports usage after its "
             "first SDK call since startup.",
         )
+    elif not (data.get("sources") or {}).get("oauth"):
+        data.setdefault(
+            "note",
+            "No Claude Max OAuth usage source for this profile — utilization "
+            "percentages will be missing/null on buckets; overage-tracked "
+            "fields (isUsingOverage etc.) may still be populated.",
+        )
     return json.dumps(data)
+
+
+# Meridian's own mapModelToClaudeModel() resolves these aliases internally
+# (proxy/models.ts) but /v1/models never lists them as catalog entries — it
+# only returns the versioned ids. Listed here as their own entries (not just
+# a footnote) so they're directly visible/usable, not easy to miss.
+_ALIASES = (
+    {"id": "sonnet", "note": "alias — resolves to Meridian's currently pinned Sonnet"},
+    {"id": "opus", "note": "alias — resolves to Meridian's currently pinned Opus"},
+    {"id": "haiku", "note": "alias — resolves to Meridian's currently pinned Haiku"},
+    {"id": "fable", "note": "alias — resolves to Meridian's currently pinned Fable"},
+    {
+        "id": "opus[1m]",
+        "note": "alias — Opus with the 1M-context window, where the subscription/proxy config allows it",
+    },
+    {
+        "id": "fable[1m]",
+        "note": "alias — Fable with the 1M-context window, where the subscription/proxy config allows it",
+    },
+)
 
 
 def meridian_models(args: dict, **kwargs) -> str:
@@ -195,9 +260,13 @@ def meridian_models(args: dict, **kwargs) -> str:
     return json.dumps(
         {
             "models": models,
+            "aliases": list(_ALIASES),
             "note": (
-                "Bare aliases (sonnet, opus, haiku, fable) and [1m] context "
-                "variants (e.g. opus[1m]) are also accepted as model ids."
+                "'models' are Meridian's live catalog (versioned ids only — "
+                "it never lists aliases itself); 'aliases' are additional "
+                "accepted model ids resolved internally by Meridian, listed "
+                "here from static knowledge of its alias-resolution logic, "
+                "not fetched live."
             ),
         }
     )
